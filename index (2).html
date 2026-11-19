@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Self-Drive Car Rentals</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--tx:#14181f;--mut:#5f6b7a;--bd:#e2e6ec;--ac:#0b6e4f;--ac2:#e8f5ef;--on:#fff;--wa:#25d366;--bad:#b3261e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1318;--card:#181e26;--tx:#eef1f5;--mut:#9aa6b5;--bd:#2a323d;--ac:#3ecf9a;--ac2:#14302a;--on:#06241b;--bad:#ff8a80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1318;--card:#181e26;--tx:#eef1f5;--mut:#9aa6b5;--bd:#2a323d;--ac:#3ecf9a;--ac2:#14302a;--on:#06241b;--bad:#ff8a80;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:var(--ac);color:var(--on);padding:28px 16px 56px;text-align:center}
+header h1{margin:0 0 4px;font-size:1.7rem}header p{margin:0;opacity:.9}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px 70px}
+.search{background:var(--card);border:1px solid var(--bd);border-radius:14px;margin-top:-34px;padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;box-shadow:0 4px 16px rgba(0,0,0,.08)}
+label{display:block;font-size:.8rem;color:var(--mut);margin-bottom:4px;font-weight:600}
+input,select,textarea{width:100%;padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 6px}
+.chip{border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:99px;padding:6px 14px;cursor:pointer;font:inherit;font-size:.9rem}
+.chip.on{background:var(--ac);color:var(--on);border-color:var(--ac)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:16px;margin-top:12px}
+.car{background:var(--card);border:1px solid var(--bd);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.pic{background:var(--ac2);font-size:64px;text-align:center;height:180px;display:flex;align-items:center;justify-content:center}
+.pic img{width:100%;height:100%;object-fit:cover}
+.body{padding:14px;display:flex;flex-direction:column;gap:8px;flex:1}
+.body h3{margin:0;font-size:1.1rem}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:.75rem;background:var(--ac2);color:var(--ac);padding:2px 8px;border-radius:99px}
+.price{font-size:1.25rem;font-weight:700}.price small{font-weight:400;color:var(--mut);font-size:.8rem}
+.btn{border:0;border-radius:10px;padding:11px 16px;font:inherit;font-weight:600;cursor:pointer;background:var(--ac);color:var(--on);width:100%}
+.btn:disabled{background:var(--bd);color:var(--mut);cursor:not-allowed}
+.btn.wa{background:var(--wa);color:#073b1a;display:block;text-align:center;text-decoration:none}
+.btn.ghost{background:transparent;color:var(--tx);border:1px solid var(--bd)}
+.btn.sm{width:auto;padding:6px 12px;font-size:.85rem}
+.na{color:var(--bad);font-size:.85rem;font-weight:600}.ok{color:var(--ac);font-size:.85rem;font-weight:600}
+.empty{text-align:center;color:var(--mut);padding:40px 0}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.modal.show{display:flex}
+.sheet{background:var(--card);width:100%;max-width:560px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:18px}
+@media(min-width:600px){.modal{align-items:center}.sheet{border-radius:18px}}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.f{margin-bottom:10px}
+.sum{background:var(--ac2);border-radius:10px;padding:12px;margin:10px 0;font-size:.92rem}
+.sum div{display:flex;justify-content:space-between}
+.sum .t{font-weight:700;font-size:1.05rem;border-top:1px dashed var(--bd);margin-top:6px;padding-top:6px}
+.err{color:var(--bad);font-size:.85rem;min-height:1.2em;margin-bottom:6px}
+h2{margin:28px 0 4px}.note{color:var(--mut);font-size:.85rem}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:10px}
+.steps div{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;font-size:.9rem}
+footer{text-align:center;color:var(--mut);font-size:.85rem;padding:20px 16px}
+.mybk{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin-top:8px;font-size:.9rem}
+.pay{text-align:center;background:var(--ac2);border-radius:12px;padding:14px;margin:12px 0}
+.pay img{width:220px;max-width:70%;border-radius:10px;background:#fff;padding:6px}
+#admBtn{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:auto;display:none;z-index:10;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.arow{display:flex;gap:10px;align-items:center;border:1px solid var(--bd);border-radius:10px;padding:8px;margin-bottom:8px}
+.arow img,.arow .th{width:56px;height:42px;object-fit:cover;border-radius:6px;background:var(--ac2);display:flex;align-items:center;justify-content:center}
+.arow .g{flex:1;min-width:0}
+.rng{display:inline-block;background:var(--ac2);border-radius:99px;padding:2px 10px;margin:2px;font-size:.8rem}
+.rng b{cursor:pointer;margin-left:6px;color:var(--bad)}
+.prev{max-width:120px;max-height:90px;border-radius:8px;margin-top:6px;display:block}
+</style>
+</head>
+<body>
+<header><h1 id="hTitle">🚗 Self-Drive Car Rentals</h1><p>Pick your dates, pick your car, book in under a minute</p></header>
+<div class="wrap">
+  <div class="search">
+    <div><label for="from">Pickup date</label><input type="date" id="from"></div>
+    <div><label for="to">Return date</label><input type="date" id="to"></div>
+    <div><label for="sort">Sort by</label><select id="sort"><option value="p1">Price: low to high</option><option value="p2">Price: high to low</option><option value="s">Seats</option></select></div>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div class="grid" id="grid"></div>
+  <h2>How it works</h2>
+  <div class="steps">
+    <div><b>1. Choose</b><br>Select dates and an available car.</div>
+    <div><b>2. Request &amp; pay advance</b><br>Your request goes to the owner on WhatsApp. Pay the advance by scanning the QR.</div>
+    <div><b>3. Confirm</b><br>The owner confirms. Carry your licence and ID at pickup.</div>
+  </div>
+  <h2>Rental terms</h2>
+  <p class="note">Valid driving licence and a government photo ID required. Advance is adjusted in the final bill. Refundable security deposit is collected at pickup. Fuel is return-as-received. Extra km beyond the daily limit and late returns are charged extra. Free cancellation up to 24 hours before pickup.</p>
+  <h2>Track a booking</h2><p class="note">Enter your booking code (like BK-C1-…) to see if the owner has confirmed.</p><div style="display:flex;gap:8px"><input id="trkIn" placeholder="BK-..."><button class="btn sm" id="trkBtn">Check</button></div><div id="trkOut" class="mybk" style="display:none"></div><h2>My requests on this device</h2><div id="mine"></div>
+</div>
+<footer>Questions? <a id="callLink" href="#" style="color:var(--ac)">Call the owner</a> · <a id="ownLink" href="#" style="color:var(--mut)">Owner login</a></footer>
+<button class="btn" id="admBtn">⚙ Owner panel</button>
+
+<div class="modal" id="modal"><div class="sheet">
+  <div id="formView">
+    <h3 id="mTitle" style="margin:0 0 4px"></h3><p class="note" id="mSub" style="margin:0 0 12px"></p>
+    <div class="row"><div class="f"><label>Pickup date</label><input type="date" id="mFrom"></div><div class="f"><label>Return date</label><input type="date" id="mTo"></div></div>
+    <div class="f"><label>Full name</label><input id="name" autocomplete="name"></div>
+    <div class="row"><div class="f"><label>Mobile number</label><input id="phone" inputmode="tel" autocomplete="tel" placeholder="10 digits"></div><div class="f"><label>Driving licence no.</label><input id="dl"></div></div>
+    <div class="row"><div class="f"><label>Pickup time</label><input type="time" id="time" value="10:00"></div><div class="f"><label>Pickup / drop</label><select id="loc"><option value="0">Pickup at owner’s location</option><option value="1">Home delivery</option></select></div></div>
+    <div class="f"><label>Notes (optional)</label><textarea id="notes" rows="2" placeholder="Child seat, airport pickup, etc."></textarea></div>
+    <div class="f" id="drvF" style="display:none"><label>Driver</label><select id="drv"><option value="0">Self-drive</option><option value="1">With driver</option></select></div>
+    <label style="display:flex;gap:8px;align-items:flex-start;font-weight:400;font-size:.85rem"><input type="checkbox" id="agree" style="width:auto;margin-top:4px"> I agree to the rental terms and will carry my driving licence and ID proof.</label>
+    <div class="sum" id="sum"></div><div class="err" id="err"></div>
+    <button class="btn" id="submit">Send booking request on WhatsApp</button>
+    <button class="btn ghost" id="cancel" style="margin-top:8px">Close</button>
+  </div>
+  <div id="doneView" style="display:none">
+    <h3 style="margin:0 0 6px">✅ Request ready · <span id="bid"></span></h3>
+    <p style="margin:0">1. WhatsApp opened with your request. <b>Press Send</b> so the owner gets it.</p>
+    <p class="note" style="margin:6px 0 0">Keep this booking code. Use “Track a booking” on the page to see when the owner confirms.</p><div class="pay" id="payBox"></div>
+    <p style="margin:0 0 8px">3. After paying, send the screenshot to the owner:</p>
+    <a class="btn wa" id="waAgain" target="_blank" rel="noopener">Open WhatsApp</a>
+    <button class="btn ghost" id="closeDone" style="margin-top:8px">Done</button>
+  </div>
+</div></div>
+
+<div class="modal" id="amodal"><div class="sheet" id="adm"></div></div>
+
+<script id="state" type="application/json">{"biz":"Self-Drive Car Rentals","phone":"919493483829","upi":"","upiName":"","qr":"","pin":"1234","adv":25,"drv":0,"del":0,"conf":{},"cars":[
+{"id":"c1","name":"Maruti Swift","type":"Hatchback","emoji":"🚗","seats":5,"fuel":"Petrol","gear":"Manual","rate":1500,"deposit":5000,"km":200,"photo":"","booked":[]},
+{"id":"c2","name":"Hyundai i20","type":"Hatchback","emoji":"🚙","seats":5,"fuel":"Petrol","gear":"Automatic","rate":1800,"deposit":5000,"km":200,"photo":"","booked":[]},
+{"id":"c3","name":"Hyundai Creta","type":"SUV","emoji":"🚙","seats":5,"fuel":"Diesel","gear":"Manual","rate":3200,"deposit":10000,"km":250,"photo":"","booked":[]},
+{"id":"c4","name":"Toyota Innova","type":"MUV","emoji":"🚐","seats":7,"fuel":"Diesel","gear":"Manual","rate":4200,"deposit":12000,"km":300,"photo":"","booked":[]}]}</script>
+<script>
+const $=id=>document.getElementById(id);
+const ORIG="<!DOCTYPE html>\n"+document.documentElement.outerHTML; /* pristine copy, taken before any rendering */
+let S=JSON.parse($("state").textContent),W=null,ed=null,typeF="All",cur=null;S.conf=S.conf||{};S.drv=S.drv||0;S.del=S.del||0;
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const inr=n=>"₹"+Number(n||0).toLocaleString("en-IN");
+const today=new Date().toISOString().slice(0,10);
+const days=(a,b)=>Math.round((new Date(b)-new Date(a))/864e5)+1;
+const clash=(c,a,b)=>c.booked.some(([s,e])=>a<=e&&b>=s);
+const validDates=(a,b)=>a&&b&&a>=today&&b>=a;
+const store=()=>{try{return JSON.parse(localStorage.getItem("bk")||"[]")}catch(e){return[]}};
+const save=v=>{try{localStorage.setItem("bk",JSON.stringify(v))}catch(e){}};
+const E0=Date.UTC(2026,0,1),dn=d=>Math.round((Date.parse(d)-E0)/864e5),dd=n=>new Date(E0+n*864e5).toISOString().slice(0,10);
+const hs=t=>{let h=7;for(const c of t)h=(h*31+c.charCodeAt(0))%46656;return h.toString(36).toUpperCase().padStart(3,"0")};
+const mk=(car,a,b,ph)=>{const p=("BK-"+car+"-"+dn(a).toString(36)+"-"+days(a,b)+"-"+ph.slice(-4)).toUpperCase();return p+"-"+hs("kz"+p)};
+function dec(code,Z=S){const k=String(code).trim().toUpperCase(),m=k.match(/^BK-([A-Z0-9]+)-([A-Z0-9]+)-(\d+)-(\d{4})-([A-Z0-9]{3})$/);if(!m)return null;if(hs("kz"+k.slice(0,-4))!==m[5])return{bad:1};const t=parseInt(m[2],36),n=+m[3];return{k,car:Z.cars.find(c=>c.id.toUpperCase()===m[1]),a:dd(t),b:dd(t+n-1),n,ph:m[4],st:(Z.conf||{})[k]}}
+const stat=t=>t==="c"?'<span class="ok">✔ Confirmed by owner</span>':t==="d"?'<span class="na">✖ Declined by owner</span>':'<span class="note">⏳ Pending: owner will confirm on WhatsApp</span>';
+function chime(){try{const a=new(window.AudioContext||window.webkitAudioContext)();[880,1175,1568].forEach((f,i)=>{const o=a.createOscillator(),g=a.createGain(),t=a.currentTime+i*.15;o.frequency.value=f;o.connect(g);g.connect(a.destination);g.gain.setValueAtTime(.25,t);g.gain.exponentialRampToValueAtTime(.001,t+.3);o.start(t);o.stop(t+.3)})}catch(e){}}
+
+$("from").min=$("to").min=today;
+$("hTitle").textContent="🚗 "+S.biz;document.title=S.biz;
+$("callLink").href="tel:+"+S.phone;
+
+function chips(){
+  const types=["All",...new Set(S.cars.map(c=>c.type))];
+  $("chips").innerHTML=types.map(t=>`<button class="chip ${t===typeF?"on":""}" data-t="${esc(t)}">${esc(t)}</button>`).join("");
+  $("chips").querySelectorAll("button").forEach(b=>b.onclick=()=>{typeF=b.dataset.t;chips();render()});
+}
+function render(){
+  const a=$("from").value,b=$("to").value,ok=validDates(a,b),s=$("sort").value;
+  let list=S.cars.filter(c=>typeF==="All"||c.type===typeF);
+  list.sort((x,y)=>s==="p1"?x.rate-y.rate:s==="p2"?y.rate-x.rate:y.seats-x.seats);
+  if(!list.length){$("grid").innerHTML='<div class="empty">No cars listed yet.</div>';return}
+  $("grid").innerHTML=list.map(c=>{
+    const busy=ok&&clash(c,a,b);
+    const st=!ok?'<span class="note">Select dates to check availability</span>':busy?'<span class="na">Not available for these dates</span>':'<span class="ok">✔ Available for your dates</span>';
+    return `<div class="car"><div class="pic">${c.photo?`<img src="${c.photo}" alt="${esc(c.name)}">`:c.emoji}</div><div class="body">
+    <h3>${esc(c.name)}</h3>
+    <div class="tags"><span class="tag">${esc(c.type)}</span><span class="tag">${c.seats} seats</span><span class="tag">${esc(c.fuel)}</span><span class="tag">${esc(c.gear)}</span><span class="tag">${c.km} km/day</span></div>
+    <div class="price">${inr(c.rate)} <small>/ day</small></div>
+    <div class="note">Deposit ${inr(c.deposit)} (refundable)</div>${st}
+    <button class="btn" data-id="${c.id}" ${busy?"disabled":""}>${busy?"Unavailable":"Book now"}</button></div></div>`}).join("");
+  $("grid").querySelectorAll("button[data-id]").forEach(b=>b.onclick=()=>openModal(b.dataset.id));
+}
+function openModal(id){
+  cur=S.cars.find(c=>c.id===id);
+  $("mTitle").textContent=cur.name;$("mSub").textContent=cur.type+" · "+cur.seats+" seats · "+cur.fuel+" · "+cur.gear;
+  $("mFrom").min=$("mTo").min=today;$("mFrom").value=$("from").value;$("mTo").value=$("to").value;
+  $("err").textContent="";$("formView").style.display="";$("doneView").style.display="none";
+  $("drvF").style.display=S.drv>0?"":"none";$("drv").value="0";$("loc").value="0";$("agree").checked=false;
+  $("drv").options[1].text="With driver (+"+inr(S.drv)+"/day)";$("loc").options[1].text="Home delivery"+(S.del?" (+"+inr(S.del)+")":" (charges may apply)");summary();$("modal").classList.add("show");
+}
+function summary(){
+  const a=$("mFrom").value,b=$("mTo").value;
+  if(!validDates(a,b)){$("sum").innerHTML="Choose valid pickup and return dates.";return null}
+  const n=days(a,b),rent=n*cur.rate,dr=$("drv").value==="1"&&S.drv>0,dv=$("loc").value==="1"?S.del:0,extra=(dr?S.drv*n:0)+dv,total=rent+extra,adv=Math.round(total*S.adv/100);
+  $("sum").innerHTML=`<div><span>${inr(cur.rate)} × ${n} day${n>1?"s":""}</span><span>${inr(rent)}</span></div>
+  ${extra?`<div><span>${dr?"Driver":""}${dr&&dv?" + ":""}${dv?"Delivery":""} charges</span><span>${inr(extra)}</span></div>`:""}
+  <div><span>Km limit</span><span>${cur.km*n} km</span></div>
+  <div><span>Refundable deposit (at pickup)</span><span>${inr(cur.deposit)}</span></div>
+  <div><span>Advance to pay now (${S.adv}%)</span><span>${inr(adv)}</span></div>
+  <div><span>Balance at pickup</span><span>${inr(total-adv)}</span></div><div class="t"><span>Total rent</span><span>${inr(total)}</span></div>`;
+  return{a,b,n,rent,adv,extra,total,dr};
+}
+["mFrom","mTo","drv","loc"].forEach(i=>$(i).onchange=summary);
+const close=()=>$("modal").classList.remove("show");
+$("cancel").onclick=close;$("closeDone").onclick=close;
+$("modal").onclick=e=>{if(e.target===$("modal"))close()};
+
+$("submit").onclick=()=>{
+  const d=summary(),name=$("name").value.trim(),phone=$("phone").value.replace(/\D/g,"").slice(-10),dl=$("dl").value.trim();
+  if(!d)return $("err").textContent="Please choose valid dates.";
+  if(clash(cur,d.a,d.b))return $("err").textContent="Sorry, this car is already booked on some of these dates.";
+  if(name.length<2)return $("err").textContent="Please enter your full name.";
+  if(!/^[6-9]\d{9}$/.test(phone))return $("err").textContent="Enter a valid 10-digit mobile number.";
+  if(dl.length<6)return $("err").textContent="Enter your driving licence number.";
+  if(!$("agree").checked)return $("err").textContent="Please accept the rental terms.";
+  const id=mk(cur.id,d.a,d.b,phone);
+  const msg=`*NEW BOOKING REQUEST*\nCode: ${id}\n\n*Car:* ${cur.name}\n*Pickup:* ${d.a} at ${$("time").value}\n*Return:* ${d.b} (${d.n} day${d.n>1?"s":""})\n*Place:* ${$("loc").selectedOptions[0].text}\n*Driver:* ${d.dr?"With driver":"Self-drive"}\n\n*Bill*\nRent: ${inr(d.rent)}${d.extra?"\nDriver/delivery: "+inr(d.extra):""}\nTotal: ${inr(d.total)}\nAdvance (paying now): ${inr(d.adv)}\nBalance at pickup: ${inr(d.total-d.adv)}\nSecurity deposit at pickup: ${inr(cur.deposit)}\n\n*Customer*\nName: ${name}\nPhone: ${phone}\nLicence: ${dl}\nNotes: ${$("notes").value.trim()||"-"}\nChat: https://wa.me/91${phone}\n\nTo accept: Owner panel > Verify booking > paste the code.`;
+  const url="https://wa.me/"+S.phone+"?text="+encodeURIComponent(msg);
+  const pay="https://wa.me/"+S.phone+"?text="+encodeURIComponent(`Payment done for booking ${id} (${inr(d.adv)}). Screenshot attached.`);
+  const all=store();all.unshift({id,car:cur.name,a:d.a,b:d.b,rent:d.rent});save(all.slice(0,20));
+  let p=`<b>2. Pay advance ${inr(d.adv)}</b><br>`;
+  if(S.qr)p+=`<img src="${S.qr}" alt="Payment QR"><br><span class="note">Scan with any UPI app</span><br>`;
+  if(S.upi){p+=`<span class="note">UPI ID: <b>${esc(S.upi)}</b></span><br>`;
+    p+=`<a class="btn sm" style="display:inline-block;margin-top:8px;text-decoration:none" href="upi://pay?pa=${encodeURIComponent(S.upi)}&pn=${encodeURIComponent(S.upiName||S.biz)}&am=${d.adv}&cu=INR&tn=${id}">Pay with UPI app</a>`}
+  if(!S.qr&&!S.upi)p+=`<span class="note">The owner will share payment details on WhatsApp.</span>`;
+  $("payBox").innerHTML=p;$("bid").textContent=id;$("waAgain").href=pay;
+  $("formView").style.display="none";$("doneView").style.display="";
+  chime();window.open(url,"_blank");mine();
+};
+function mine(){
+  const v=store();
+  $("mine").innerHTML=v.length?v.map(x=>`<div class="mybk"><b>${x.id}</b> · ${esc(x.car)} · ${x.a} to ${x.b} · ${inr(x.rent)}<br>${stat(S.conf[x.id])}</div>`).join(""):'<p class="note">No requests yet.</p>';
+}
+$("from").onchange=()=>{if($("to").value<$("from").value)$("to").value=$("from").value;render()};
+$("to").onchange=render;$("sort").onchange=render;
+chips();render();mine();
+
+$("trkBtn").onclick=()=>{const r=dec($("trkIn").value),o=$("trkOut");o.style.display="block";o.innerHTML=!r?"That does not look like a booking code.":r.bad?'<span class="na">❌ Code not genuine. Check for typos.</span>':`<b>${r.k}</b><br>${r.car?esc(r.car.name):"Car"} · ${r.a} to ${r.b}<br>${stat(r.st)}`};
+$("ownLink").onclick=e=>{e.preventDefault();const p=prompt("Enter owner PIN");if(p===null)return;if(p===String(S.pin||"1234")){$("admBtn").style.display="block";$("admBtn").click()}else alert("Wrong PIN")};
+/* ===== Owner panel (only visible to the page owner) ===== */
+
+$("admBtn").onclick=()=>{W=JSON.parse(JSON.stringify(S));ed=null;admRender();$("amodal").classList.add("show")};
+function resize(file,max){return new Promise((res,rej)=>{const i=new Image(),u=URL.createObjectURL(file);i.onload=()=>{const r=Math.min(1,max/Math.max(i.width,i.height)),c=document.createElement("canvas");c.width=Math.round(i.width*r);c.height=Math.round(i.height*r);c.getContext("2d").drawImage(i,0,0,c.width,c.height);URL.revokeObjectURL(u);res(c.toDataURL(max<=600?"image/png":"image/jpeg",.78))};i.onerror=rej;i.src=u})}
+function admRender(){
+  const v=W,h=[];
+  if(ed===null){
+    h.push(`<h3 style="margin:0 0 10px">Owner panel</h3>
+    <div class="f"><label>Business name</label><input data-k="s.biz" value="${esc(v.biz)}"></div>
+    <div class="row"><div class="f"><label>WhatsApp number (with 91)</label><input data-k="s.phone" inputmode="tel" value="${esc(v.phone)}"></div>
+    <div class="f"><label>Advance % to collect</label><input data-k="s.adv" data-n="1" type="number" value="${v.adv}"></div></div>
+    <div class="row"><div class="f"><label>UPI ID (optional)</label><input data-k="s.upi" placeholder="name@bank" value="${esc(v.upi)}"></div>
+    <div class="f"><label>Name on UPI</label><input data-k="s.upiName" value="${esc(v.upiName)}"></div></div>
+    <div class="f"><label>Owner PIN (opens this panel)</label><input data-k="s.pin" value="${esc(v.pin||"1234")}"></div>
+    <div class="row"><div class="f"><label>Driver charge per day (₹, 0 = not offered)</label><input data-k="s.drv" data-n="1" type="number" value="${v.drv||0}"></div><div class="f"><label>Home delivery fee (₹)</label><input data-k="s.del" data-n="1" type="number" value="${v.del||0}"></div></div>
+    <div class="f"><label>Business payment QR (upload screenshot or photo)</label><input type="file" accept="image/*" data-img="qr">${v.qr?`<img class="prev" src="${v.qr}">`:""}</div>
+    <h3 style="margin:14px 0 4px">Verify a booking</h3><p class="note" style="margin:0 0 6px">Paste the code from the customer’s WhatsApp message.</p>
+    <div style="display:flex;gap:8px"><input id="vc" placeholder="BK-C1-..."><button class="btn sm" data-act="ver">Check</button></div><div id="vout"></div>
+    <h3 style="margin:14px 0 8px">Your cars</h3>`);
+    v.cars.forEach((c,i)=>h.push(`<div class="arow">${c.photo?`<img src="${c.photo}">`:`<div class="th">${c.emoji}</div>`}<div class="g"><b>${esc(c.name)}</b><div class="note">${inr(c.rate)}/day · ${c.booked.length} blocked range(s)</div></div><button class="btn sm ghost" data-act="edit" data-i="${i}">Edit</button><button class="btn sm ghost" data-act="del" data-i="${i}">✕</button></div>`));
+    h.push(`<button class="btn ghost" data-act="add">+ Add a car</button><div class="err" id="aerr" style="margin-top:8px"></div>
+    <button class="btn" data-act="pub">Save &amp; download site file</button><button class="btn ghost" data-act="x" style="margin-top:8px">Close</button>`);
+  }else{
+    const c=v.cars[ed];
+    const o=(k,list)=>list.map(x=>`<option ${x===c[k]?"selected":""}>${x}</option>`).join("");
+    h.push(`<h3 style="margin:0 0 10px">${esc(c.name||"New car")}</h3>
+    <div class="f"><label>Car name</label><input data-k="c.name" value="${esc(c.name)}"></div>
+    <div class="row"><div class="f"><label>Type</label><select data-k="c.type">${o("type",["Hatchback","Sedan","SUV","MUV","Luxury","Tempo Traveller"])}</select></div>
+    <div class="f"><label>Seats</label><input data-k="c.seats" data-n="1" type="number" value="${c.seats}"></div></div>
+    <div class="row"><div class="f"><label>Fuel</label><select data-k="c.fuel">${o("fuel",["Petrol","Diesel","CNG","Electric"])}</select></div>
+    <div class="f"><label>Gear</label><select data-k="c.gear">${o("gear",["Manual","Automatic"])}</select></div></div>
+    <div class="row"><div class="f"><label>Rent per day (₹)</label><input data-k="c.rate" data-n="1" type="number" value="${c.rate}"></div>
+    <div class="f"><label>Security deposit (₹)</label><input data-k="c.deposit" data-n="1" type="number" value="${c.deposit}"></div></div>
+    <div class="f"><label>Free km per day</label><input data-k="c.km" data-n="1" type="number" value="${c.km}"></div>
+    <div class="f"><label>Car photo</label><input type="file" accept="image/*" data-img="photo">${c.photo?`<img class="prev" src="${c.photo}">`:""}</div>
+    <div class="f"><label>Blocked dates (already booked or unavailable)</label>
+    <div>${c.booked.map((r,j)=>`<span class="rng">${r[0]} → ${r[1]}<b data-act="rm" data-j="${j}">✕</b></span>`).join("")||'<span class="note">None</span>'}</div>
+    <div class="row" style="margin-top:6px"><input type="date" id="bf"><input type="date" id="bt"></div>
+    <button class="btn sm ghost" data-act="addr" style="margin-top:6px">Block these dates</button></div>
+    <button class="btn" data-act="done">Done</button>`);
+  }
+  $("adm").innerHTML=h.join("");
+}
+$("adm").oninput=e=>{const k=e.target.dataset.k;if(!k)return;const[s,key]=k.split("."),t=s==="s"?W:W.cars[ed];t[key]=e.target.dataset.n?Number(e.target.value)||0:e.target.value};
+$("adm").onchange=async e=>{
+  const t=e.target,k=t.dataset.img;if(!k||!t.files[0])return;
+  try{const d=await resize(t.files[0],k==="qr"?480:900);if(k==="qr")W.qr=d;else W.cars[ed].photo=d;admRender()}catch(x){$("adm").insertAdjacentHTML("afterbegin",'<div class="err">Could not read that image.</div>')}
+};
+$("adm").onclick=async e=>{
+  const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act,i=+b.dataset.i;
+  if(a==="x"){$("amodal").classList.remove("show")}
+  else if(a==="edit"){ed=i;admRender()}
+  else if(a==="del"){if(confirm("Remove this car?")){W.cars.splice(i,1);admRender()}}
+  else if(a==="add"){W.cars.push({id:"c"+Math.random().toString(36).slice(2,5),name:"",type:"Hatchback",emoji:"🚗",seats:5,fuel:"Petrol",gear:"Manual",rate:1500,deposit:5000,km:200,photo:"",booked:[]});ed=W.cars.length-1;admRender()}
+  else if(a==="done"){if(!W.cars[ed].name.trim())W.cars[ed].name="My car";ed=null;admRender()}
+  else if(a==="rm"){W.cars[ed].booked.splice(+b.dataset.j,1);admRender()}
+  else if(a==="addr"){const f=$("bf").value,t=$("bt").value||f;if(f&&t>=f){W.cars[ed].booked.push([f,t]);admRender()}}
+  else if(a==="ver"){const r=dec($("vc").value,W),o=$("vout");
+    if(!r)o.innerHTML='<div class="err">That is not a booking code.</div>';
+    else if(r.bad)o.innerHTML='<div class="err">❌ Fake or mistyped code. It does not pass the check.</div>';
+    else{const c=r.car,ov=c&&!r.st&&clash(c,r.a,r.b);
+      o.innerHTML=`<div class="mybk"><b>${r.k}</b><br>✔ Genuine code<br>${c?esc(c.name):"Car no longer listed"} · ${r.a} to ${r.b} (${r.n} day${r.n>1?"s":""})<br>Customer phone ends with ${r.ph}<br>${stat(r.st)}${ov?'<br><span class="na">⚠ These dates overlap a blocked range</span>':""}${c&&!r.st?`<div style="display:flex;gap:8px;margin-top:8px"><button class="btn sm" data-act="cf" data-k="${r.k}">Confirm &amp; block dates</button><button class="btn sm ghost" data-act="dc" data-k="${r.k}">Decline</button></div>`:""}</div>`}}
+  else if(a==="cf"||a==="dc"){const r=dec(b.dataset.k,W);if(!r||r.bad)return;W.conf=W.conf||{};
+    if(a==="cf"){if(!r.car)return;if(clash(r.car,r.a,r.b))return $("vout").insertAdjacentHTML("beforeend",'<div class="err">Dates overlap another booking. Cannot confirm.</div>');r.car.booked.push([r.a,r.b]);W.conf[r.k]="c"}else W.conf[r.k]="d";
+    admRender();$("vc").value=r.k;$("adm").querySelector('[data-act="ver"]').click();$("aerr").textContent="Now tap Save & download, then upload the new file to your hosting."}
+  else if(a==="pub"){
+    const er=$("aerr");er.textContent="";
+    let p=String(W.phone).replace(/\D/g,"");if(p.length===10)p="91"+p;
+    if(p.length<11)return er.textContent="Enter a valid WhatsApp number.";
+    W.phone=p;W.adv=Math.min(100,Math.max(0,W.adv));
+    try{
+      
+      const json=JSON.stringify(W).replace(/</g,"\\u003c");
+      const html=ORIG.replace(/(<script id="state" type="application\/json">)[\s\S]*?(<\/script>)/,(m,x,y)=>x+json+y);
+      const bl=new Blob([html],{type:"text/html"}),an=document.createElement("a");an.href=URL.createObjectURL(bl);an.download="index.html";document.body.appendChild(an);an.click();an.remove();er.textContent="Downloaded index.html. Upload it to your free hosting to make these changes live.";
+    }catch(x){er.textContent="Could not publish: "+((x&&x.message)||x.code||"try again")}
+  }
+};
+</script>
+</body>
+</html>
